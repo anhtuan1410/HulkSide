@@ -1,4 +1,5 @@
-﻿using HulkSide.Models;
+﻿using HulkSide.DI;
+using HulkSide.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -73,6 +74,33 @@ namespace HulkSide.Controllers
                         data = t
                     };
                 }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResult
+                {
+                    status = false,
+                    error = new ErrorResult
+                    {
+                        ErrCode = 224,
+                        ErrMsg = ex.Message
+                    }
+                };
+            }
+        }
+
+        [HttpPost("getdi")]
+        public BaseResult GetDI()
+        {
+            try
+            {
+                DIProvider k = new DIProvider((new Random()).Next(1,4));
+                
+                return new BaseResult
+                {
+                    status = true,
+                    data = k.execute()
+                };
             }
             catch (Exception ex)
             {
