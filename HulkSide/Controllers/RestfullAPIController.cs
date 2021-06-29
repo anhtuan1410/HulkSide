@@ -372,6 +372,13 @@ namespace HulkSide.Controllers
             {
                 using (var db = new SampleDatabaseContext())
                 {
+                    var _ug = db.Usergroups.Where(x => x.IdUserGroup.Equals(keyid)).FirstOrDefault();
+                    if(_ug != null)
+                    {
+                        db.Usergroups.Remove(_ug);
+                    }
+                    db.SaveChanges();
+
                     return new BaseResult
                     {
                         status = true,
