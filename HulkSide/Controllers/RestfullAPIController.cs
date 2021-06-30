@@ -298,7 +298,7 @@ namespace HulkSide.Controllers
         }
 
         /// <summary>
-        /// put is update a field in one of follow id of object single
+        /// patch is update a field in one of follow id of object single
         /// </summary>
         /// <returns></returns>
         [HttpPatch("patchmethod/{keyid}")]
