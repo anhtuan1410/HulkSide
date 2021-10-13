@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Running;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -14,6 +15,7 @@ namespace HulkSide
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
+            BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
