@@ -76,7 +76,7 @@ namespace HulkSide.Controllers
             SortedDictionary<string, ObjectHashSet> v_dicSort = new SortedDictionary<string, ObjectHashSet>();
             SortedList<string, ObjectHashSet> v_listSort = new SortedList<string, ObjectHashSet>();
             SortedSet<ObjectHashSet> v_sortSet = new SortedSet<ObjectHashSet>();
-
+            
             for (int i = 0; i < 20_000; i++)
             {
                 var _obj = new ObjectHashSet
@@ -148,6 +148,70 @@ namespace HulkSide.Controllers
                 TS2 = ts2,
                 TS3 = ts3
             };
+        }
+
+        [Route("LocalFuntion")]
+        [HttpPost]
+        [Benchmark]
+        public async ValueTask<object> LocalFuntion()
+        {
+
+            SortedList<int, int> _hs = new SortedList<int, int>();
+            int _count = 0;
+            while(_count < 10_000)
+            {
+                _hs.Add(_count,_count++);
+            }
+
+            TimeSpan getSum(SortedList<int, int> _hsPs)
+            {
+                Stopwatch p = Stopwatch.StartNew();
+                p.Start();
+
+                int _ind = 0, _sum =0;
+                if(_hsPs != null)
+                {
+                    int _nextind = _ind + 1;
+                    if(_nextind < _hsPs.Count)
+                    {
+                        _hs[_ind] = _hs[_ind] + _hs[_nextind];
+                    }
+                    _hsPs.Values.ToList().ForEach(x => _sum += x);
+                    p.Stop();
+                    return p.Elapsed;
+                }
+                return new TimeSpan();
+            }
+
+            return new
+            {
+                SumLocalFunction = getSum(_hs)
+            };
+
+        }
+
+        [Route("LoadTupple")]
+        [HttpPost]
+        [Benchmark]
+        public async Task<object> LoadTupple()
+        {
+
+            Tuple<int, int, bool, string, List<string>, double, int, Tuple<int>> _tuple =
+                new Tuple<int, int, bool, string, List<string>, double, int, Tuple<int>>
+                (1, 2, false, "Hello tupple", new List<string> { "AAA", "BBB" }, 35, 78, new Tuple<int>(577) );
+            double _refTime = -1;
+            if(_tuple.Item6 is double p)
+            {
+                _refTime = p;
+            }
+
+            return new
+            {
+                Tuple = _tuple,
+                ChkItem1 = _tuple.Item1 is int,
+                RefVar = _refTime
+            };
+
         }
 
         [Benchmark]
