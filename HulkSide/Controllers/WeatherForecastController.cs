@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -46,7 +48,45 @@ namespace HulkSide.Controllers
             string path = _hostingEnvironment.WebRootPath + "/images/" + fileName;
             byte[] b = System.IO.File.ReadAllBytes(path);
             //return File(new FileStream('path to file',FileAccess.Read), "application/pdf", "filename.pdf");
+            
             return string.Empty;
+        }
+
+        class ObjectSamepl
+        {
+            public long Id { get; set; }
+            public List<ObjectSamepl> DataInside { get; set; }
+        }
+
+        [HttpGet("checkdataTable")]
+        public DataTable Dt()
+        {
+            List<ObjectSamepl> lst = new List<ObjectSamepl>
+            {
+               new ObjectSamepl
+               { 
+                   Id = 0, 
+                   DataInside = new List<ObjectSamepl>()
+                   { 
+                       new ObjectSamepl {  Id = 2, DataInside = null } 
+                   } 
+               },
+                new ObjectSamepl
+               {
+                   Id = 0,
+                   DataInside = new List<ObjectSamepl>()
+                   {
+                       new ObjectSamepl {  Id = 2, DataInside = null }
+                   }
+               }
+
+            };
+
+            //error right here
+            string _d = JsonConvert.SerializeObject(lst);
+            DataTable dt = JsonConvert.DeserializeObject<DataTable>(_d);
+
+            return dt;
         }
 
 

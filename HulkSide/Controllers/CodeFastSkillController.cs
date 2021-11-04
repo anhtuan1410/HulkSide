@@ -1,10 +1,12 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace HulkSide.Controllers
 {
@@ -213,6 +215,60 @@ namespace HulkSide.Controllers
             };
 
         }
+
+
+        /// <summary>
+        /// Use arraypool to reuse array, save CPU, increase performance
+        /// </summary>
+        /// <returns></returns>
+        [Route("LoadArrayPool")]
+        [HttpPost]
+        [Benchmark]
+        public async Task<object> LoadArrayPool()
+        {
+
+            ArrayPool<int> _arrpool = ArrayPool<int>.Create(10, 20);
+            ArrayPool<int> _arrpool_Share = ArrayPool<int>.Shared;
+
+            List<int[]> _lst_Pool = new List<int[]>();
+            List<int[]> _lst_NoPool = new List<int[]>();
+
+            Stopwatch p = new Stopwatch();
+            p.Start();
+
+            for (int i = 0;i< 50_000;i++)
+            {
+                var _rentArr = _arrpool_Share.Rent(25);
+                for (int j = 0; j < 20; j++)
+                {
+                    _rentArr[j] = i * 1;
+                }
+                _arrpool_Share.Return(_rentArr);
+                _lst_Pool.Add(_rentArr);
+            }
+            p.Stop();
+
+            Stopwatch p1 = new Stopwatch();
+            p1.Start();
+            for (int i = 0; i < 50_000; i++)
+            {
+                var _rentArr = new int[25];
+                for (int j = 0; j < 20; j++)
+                {
+                    _rentArr[j] = i * 1;
+                }
+                _lst_NoPool.Add(_rentArr);
+            }
+            p1.Stop();
+
+            return new
+            {
+                TS1 = p.Elapsed,
+                TS2 = p1.Elapsed,
+            };
+
+        }
+
 
         [Benchmark]
         private object _Find(HashSet<ObjectHashSet> _hs, List<ObjectHashSet> _lst, int p)
